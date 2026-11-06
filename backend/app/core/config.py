@@ -1,8 +1,10 @@
-
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parents[3]
+load_dotenv(BASE_DIR / ".env")
+
 
 def resolve_path(value: str) -> Path:
     path = Path(value).expanduser()
@@ -39,6 +41,14 @@ class Settings:
     )
 
     DATABASE_PATH = STORAGE_PATH / "jobs.db"
+    
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+
+    JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+
+    ACCESS_TOKEN_EXPIRE_MINUTES = int(
+        os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+    )
 
 settings = Settings()
 

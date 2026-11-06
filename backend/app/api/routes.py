@@ -1,15 +1,42 @@
+import logging
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import Depends
 from fastapi.responses import FileResponse
 from pathlib import Path
 
 from app.core.config import settings
+from app.core.security import create_access_token, get_current_user
+from app.services.user_manager import (
+    get_user_by_username,
+    verify_password,
+)
 from app.services import job_manager, storage
-from app.api.schemas import JobResponse
+from app.api.schemas import JobResponse, LoginRequest, TokenResponse, UserResponse
 
 
 
 router = APIRouter(prefix="/api", tags=["Render jobs"])
+
+def get_authorized_job(job_id: str, user: dict):
+    job = job_manager.get_job(job_id)
+
+    if not job:
+        raise HTTPException(
+            status_code=404,
+            detail="Trabajo no encontrado"
+        )
+
+    # El administrador puede consultar cualquier trabajo.
+    # Los demás usuarios solamente los suyos.
+    if user["role"] != "admin" and job["owner_id"] != user["id"]:
+        raise HTTPException(
+            status_code=404,
+            detail="Trabajo no encontrado"
+        )
+
+    return job
 
 
 def public_job(job):
@@ -24,7 +51,7 @@ def public_job(job):
 
 
 @router.post("/jobs", response_model=JobResponse)
-async def upload_project(file: UploadFile = File(...)):
+async def upload_project(file: UploadFile = File(...), user=Depends(get_current_user)):
 
     try:
         filename, project_path = await storage.save_upload(
@@ -34,7 +61,8 @@ async def upload_project(file: UploadFile = File(...)):
 
         job = job_manager.create_job(
             filename,
-            project_path
+            project_path,
+            owner_id=user["id"]
         )
 
         return public_job(job)
@@ -43,6 +71,7 @@ async def upload_project(file: UploadFile = File(...)):
         raise HTTPException(400, str(exc))
 
     except Exception:
+        logger.exception("Error al crear el trabajo de renderizado")
         raise HTTPException(
             500,
             "No se pudo almacenar el proyecto"
@@ -50,27 +79,28 @@ async def upload_project(file: UploadFile = File(...)):
 
 
 @router.get("/jobs", response_model=list[JobResponse])
-def get_jobs():
-    return [
-        public_job(job)
-        for job in job_manager.list_jobs()
-    ]
+def get_jobs(user=Depends(get_current_user)):
+    if user["role"] == "admin":
+        jobs = job_manager.list_jobs()
+    else:
+        jobs = job_manager.list_jobs(
+            owner_id=user["id"]
+        )
+
+    return [public_job(job) for job in jobs]
+
 
 
 @router.get("/jobs/{job_id}", response_model=JobResponse)
-def get_job(job_id: str):
-    job = job_manager.get_job(job_id)
-
-    if not job:
-        raise HTTPException(404, "Trabajo no encontrado")
-
+def get_job(job_id: str, user=Depends(get_current_user)):
+    job = get_authorized_job(job_id, user)
     return public_job(job)
 
 
 
 @router.get("/jobs/{job_id}/result")
-def get_render_result(job_id: str):
-    job = job_manager.get_job(job_id)
+def get_render_result(job_id: str, user=Depends(get_current_user)):
+    job = get_authorized_job(job_id, user)
 
     if not job:
         raise HTTPException(404, "Trabajo no encontrado")
@@ -91,8 +121,8 @@ def get_render_result(job_id: str):
 
 
 @router.get("/jobs/{job_id}/download")
-def download_render(job_id: str):
-    job = job_manager.get_job(job_id)
+def download_render(job_id: str, user=Depends(get_current_user)):
+    job = get_authorized_job(job_id, user)
 
     if not job:
         raise HTTPException(404, "Trabajo no encontrado")
@@ -111,3 +141,42 @@ def download_render(job_id: str):
         media_type="image/png",
         filename=f"render_{job_id}.png"
     )
+
+
+
+
+@router.post("/auth/login", response_model=TokenResponse)
+def login(data: LoginRequest):
+
+    user = get_user_by_username(data.username)
+
+    if (
+        not user
+        or not user["active"]
+        or not verify_password(
+            data.password,
+            user["password_hash"]
+        )
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Usuario o contraseña incorrectos"
+        )
+
+    token = create_access_token(user["id"])
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    }
+
+
+@router.get("/auth/me", response_model=UserResponse)
+def get_me(user=Depends(get_current_user)):
+    return {
+        "id": user["id"],
+        "username": user["username"],
+        "role": user["role"],
+        "active": bool(user["active"])
+    }

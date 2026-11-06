@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 .venv/
 venv/
 __pycache__/
@@ -17,3 +19,5 @@ storage/logs/*
 !storage/uploads/.gitkeep
 !storage/renders/.gitkeep
 !storage/logs/.gitkeep
+
+frontend/public/fonts/

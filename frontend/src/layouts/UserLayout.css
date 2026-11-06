@@ -1,0 +1,272 @@
+
+.user-layout {
+  --sidebar-width: 255px;
+  --green: #36E452;
+  --bg: #111411;
+  --panel: #191D19;
+  --line: #353B34;
+  --text: #F1F2ED;
+  --muted: #929B90;
+
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.user-layout.collapsed {
+  --sidebar-width: 78px;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 16px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  transition: width 0.25s ease;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 43px;
+  padding: 0 7px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+}
+
+.sidebar-brand > span > span {
+  color: var(--green);
+}
+
+.sidebar-logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--green);
+  color: var(--bg);
+}
+
+.collapse-button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 25px;
+  padding: 10px 7px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.collapse-button:hover {
+  color: var(--green);
+}
+
+/* NAVIGATION */
+
+.sidebar-section {
+  margin-top: 34px;
+}
+
+.sidebar-section > p {
+  padding: 0 10px;
+  margin-bottom: 14px;
+  color: #727B70;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sidebar nav a,
+.logout-button {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 11px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar nav a:hover,
+.logout-button:hover {
+  color: var(--text);
+  background: #222823;
+}
+
+.sidebar nav a.active {
+  color: var(--green);
+  background: rgba(54, 228, 82, 0.07);
+  border-color: rgba(54, 228, 82, 0.15);
+}
+
+.sidebar nav a.active svg {
+  color: var(--green);
+}
+
+/* BOTTOM MENU */
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.logout-button {
+  width: 100%;
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+  padding-top: 15px;
+  min-height: 55px;
+}
+
+/* MAIN AREA */
+
+.main-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  height: 78px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 38px;
+  border-bottom: 1px solid var(--line);
+}
+
+.header-label {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: #29332A;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-details strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.user-details span {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 42px;
+  min-width: 0;
+}
+
+/* COLLAPSED SIDEBAR */
+
+.collapsed .sidebar {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 0;
+}
+
+.collapsed .sidebar nav a,
+.collapsed .logout-button {
+  justify-content: center;
+  padding: 0;
+}
+
+.collapsed .collapse-button {
+  justify-content: center;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+  .user-layout {
+    --sidebar-width: 68px;
+  }
+
+  .sidebar {
+    padding: 18px 9px;
+  }
+
+  .sidebar-brand {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar-brand > span,
+  .sidebar-section > p,
+  .sidebar nav a span,
+  .logout-button span {
+    display: none;
+  }
+
+  .sidebar nav a,
+  .logout-button {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .dashboard-header {
+    padding: 0 18px;
+  }
+
+  .dashboard-content {
+    padding: 24px 18px;
+  }
+
+  .user-details {
+    display: none;
+  }
+}

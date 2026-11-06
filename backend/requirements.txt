@@ -3,3 +3,6 @@ fastapi
 uvicorn[standard]
 python-multipart
 pydantic-settings
+pwdlib[argon2]
+PyJWT
+python-dotenv

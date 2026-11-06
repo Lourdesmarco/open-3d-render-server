@@ -50,9 +50,28 @@ def initialize_database():
         if "worker_id" not in columns:
             db.execute("ALTER TABLE jobs ADD COLUMN worker_id TEXT")
 
+        if "owner_id" not in columns:
+            db.execute(
+                "ALTER TABLE jobs ADD COLUMN owner_id TEXT"
+            )
 
+        db.execute("""
+            CREATE INDEX IF NOT EXISTS idx_jobs_owner
+            ON jobs(owner_id)
+        """)
 
-def create_job(filename: str, project_path: Path):
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'student',
+                active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL
+            )
+        """)
+
+def create_job(filename: str, project_path: Path, owner_id: str):
     job_id = uuid.uuid4().hex
 
     created_at = datetime.now(
@@ -62,16 +81,21 @@ def create_job(filename: str, project_path: Path):
     with get_connection() as db:
         db.execute("""
             INSERT INTO jobs (
-                id, filename, status,
-                created_at, project_path
+                id,
+                filename,
+                status,
+                created_at,
+                project_path,
+                owner_id
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (
             job_id,
             filename,
             "queued",
             created_at,
-            str(project_path)
+            str(project_path),
+            owner_id
         ))
 
     return get_job(job_id)
@@ -87,12 +111,21 @@ def get_job(job_id: str):
     return dict(row) if row else None
 
 
-def list_jobs():
+def list_jobs(owner_id=None):
     with get_connection() as db:
-        rows = db.execute("""
-            SELECT * FROM jobs
-            ORDER BY created_at DESC
-        """).fetchall()
+
+        if owner_id is None:
+            rows = db.execute("""
+                SELECT * FROM jobs
+                ORDER BY created_at DESC
+            """).fetchall()
+
+        else:
+            rows = db.execute("""
+                SELECT * FROM jobs
+                WHERE owner_id = ?
+                ORDER BY created_at DESC
+            """, (owner_id,)).fetchall()
 
     return [dict(row) for row in rows]
 

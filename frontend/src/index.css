@@ -1,0 +1,86 @@
+@font-face {
+  font-family: 'Pkiko';
+  src: url('/fonts/PKiko-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PkikoItalic';
+  src: url('/fonts/PKiko-RegularItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PPNeueMontreal';
+  src: url('/fonts/PPNeueMontreal-Book.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PPNeueMontreal';
+  src: url('/fonts/PPNeueMontreal-Regular.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+:root {
+  font-family: PPNeueMontreal, system-ui, sans-serif;
+
+  color-scheme: dark;
+
+  --font-heading: 'Pkiko', sans-serif;
+  --font-body: 'PPNeueMontreal', sans-serif;
+
+  --color-bg: #101211;
+  --color-panel: #191D1A;
+  --color-surface: #222823;
+  --color-accent: rgb(54 228 82);
+
+  --color-text: #F2F5F2;
+  --color-muted: #929B93;
+  --color-border: #303832;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #101211;
+}
+
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+}
+
+body, input, button {
+  font-family: var(--font-body);
+}

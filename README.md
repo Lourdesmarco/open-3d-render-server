@@ -22,3 +22,8 @@ export BLENDER_EXECUTABLE="/Applications/Blender.app/Contents/MacOS/Blender"
 source .venv/bin/activate
 cd backend
 python -m app.worker
+
+
+#Generar tu clave y copiarla a .env -> JWT_SECRET_KEY
+
+python -c "import secrets; print(secrets.token_urlsafe(48))"
