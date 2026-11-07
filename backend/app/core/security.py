@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.config import settings
@@ -39,9 +39,22 @@ def create_access_token(user_id: str) -> str:
 
 
 def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)
 ):
-    if credentials is None:
+    token = None
+
+    # 1. Leer de la cookie de sesión
+    cookie_token = request.cookies.get("access_token")
+    if cookie_token:
+        # Por si el valor guardado es "Bearer <token>" o solo el "<token>"
+        token = cookie_token.replace("Bearer ", "").strip()
+
+    # 2. Fallback por si viene en cabecera Authorization
+    elif credentials:
+        token = credentials.credentials
+
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Autenticación requerida",
@@ -50,7 +63,7 @@ def get_current_user(
 
     try:
         payload = jwt.decode(
-            credentials.credentials,
+            token,
             settings.JWT_SECRET_KEY,
             algorithms=["HS256"]
         )

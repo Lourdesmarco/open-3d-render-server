@@ -1,5 +1,6 @@
 
-import { NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -14,6 +15,14 @@ import { useState } from 'react';
 import './UserLayout.css';
 
 export default function UserLayout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate('/', { replace: true });
+  }
+
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -77,9 +86,13 @@ export default function UserLayout() {
             </nav>
           </div>
 
-          <button className="logout-button" title="Cerrar sesión">
-            <LogOut size={19} />
-            {!collapsed && <span>Cerrar sesión</span>}
+          <button 
+          onClick={handleLogout} 
+          className="logout-button"
+          aria-label="Cerrar sesión"
+          >
+            <LogOut size={18} />
+            <span>Cerrar sesión</span>
           </button>
         </div>
 

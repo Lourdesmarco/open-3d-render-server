@@ -3,46 +3,75 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   type ReactNode,
 } from 'react';
 
 import {
-  loginRequest,
+  apiRequest,
   type User,
 } from '../api/api';
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Al cargar la app o refrescar pantalla (F5), restaurar la sesión usando la cookie
+  useEffect(() => {
+    async function restoreSession() {
+      try {
+        const currentUser = await apiRequest<User>('/auth/me', { method: 'GET' });
+        setUser(currentUser);
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    restoreSession();
+  }, []);
+
 
   async function login(username: string, password: string) {
-    const result = await loginRequest(username, password);
+    const currentUser = await apiRequest<User>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
 
-    setToken(result.token);
-    setUser(result.user);
+    setUser(currentUser);
   }
 
-  function logout() {
-    setToken(null);
-    setUser(null);
+
+  async function logout() {
+    try {
+      await apiRequest('/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    } finally {
+      setUser(null);
+    }
   }
+
+
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        token,
-        isAuthenticated: Boolean(token && user),
+        isAuthenticated: Boolean(user),
+        isLoading,
         login,
         logout,
       }}

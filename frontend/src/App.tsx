@@ -265,23 +265,60 @@ function Login() {
   );
 }
 
+function AppRoutes() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // 1. MIENTRAS CARGA LA SESIÓN (F5): Esperar antes de decidir a qué ruta ir
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'grid',
+        placeItems: 'center',
+        minHeight: '100vh',
+        background: '#111411',
+        color: '#36E452',
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        letterSpacing: '1px'
+      }}>
+        CARGANDO SESIÓN...
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      {/* 2. RUTA DE LOGIN (Si ya está autenticado y entra a "/", redirigir automáticamente a /app) */}
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? <Navigate to="/app" replace /> : <Login />
+        }
+      />
+
+      {/* 3. RUTAS PROTEGIDAS */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/app" element={<UserLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="jobs" element={<Jobs />} />
+        </Route>
+      </Route>
+
+      {/* 4. CUALQUIER OTRA RUTA: Redirigir a /app si hay sesión o a / si no la hay */}
+      <Route
+        path="*"
+        element={<Navigate to={isAuthenticated ? "/app" : "/"} replace />}
+      />
+    </Routes>
+  );
+}
+
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-
-          <Route element={<ProtectedRoute />}>
-            <Route path="/app" element={<UserLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="jobs" element={<Jobs />} />
-            </Route>
-          </Route>
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   );

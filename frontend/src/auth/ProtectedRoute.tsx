@@ -9,7 +9,23 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({
   allowedRoles,
 }: ProtectedRouteProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'grid',
+        placeItems: 'center',
+        minHeight: '100vh',
+        background: '#111411',
+        color: '#36E452',
+        fontSize: '14px',
+        letterSpacing: '1px'
+      }}>
+        CARGANDO SESIÓN...
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;

@@ -1,8 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi import Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Response
 from fastapi.responses import FileResponse
 from pathlib import Path
 
@@ -13,7 +12,7 @@ from app.services.user_manager import (
     verify_password,
 )
 from app.services import job_manager, storage
-from app.api.schemas import JobResponse, LoginRequest, TokenResponse, UserResponse
+from app.api.schemas import JobResponse, LoginRequest, UserResponse
 
 
 
@@ -144,10 +143,8 @@ def download_render(job_id: str, user=Depends(get_current_user)):
 
 
 
-
-@router.post("/auth/login", response_model=TokenResponse)
-def login(data: LoginRequest):
-
+@router.post("/auth/login", response_model=UserResponse)
+def login(data: LoginRequest, response: Response):
     user = get_user_by_username(data.username)
 
     if (
@@ -165,11 +162,28 @@ def login(data: LoginRequest):
 
     token = create_access_token(user["id"])
 
+    # Al omitir max_age / expires, la cookie se elimina al cerrar la pestaña o el navegador
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {token}",
+        httponly=True,
+        samesite="lax",
+        secure=False,  # En producción con HTTPS se cambia a True
+        path="/"
+    )
+
     return {
-        "access_token": token,
-        "token_type": "bearer",
-        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        "id": user["id"],
+        "username": user["username"],
+        "role": user["role"],
+        "active": bool(user["active"])
     }
+
+
+@router.post("/auth/logout")
+def logout(response: Response):
+    response.delete_cookie(key="access_token", path="/")
+    return {"message": "Sesión cerrada correctamente"}
 
 
 @router.get("/auth/me", response_model=UserResponse)
