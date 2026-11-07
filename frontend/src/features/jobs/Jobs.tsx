@@ -108,7 +108,7 @@ export default function Jobs() {
 
           <button 
             type="submit" 
-            className="submit-button" 
+            className="btn btn-primary" 
             disabled={!selectedFile || uploading}
           >
             {uploading ? 'Enviando...' : 'Enviar a renderizar'}
@@ -142,7 +142,7 @@ export default function Jobs() {
                 {job.result_available && (
                   <button
                     type="button"
-                    className="download-button"
+                    className="btn-action"
                     onClick={() => downloadRenderJob(job.id, job.filename)}
                   >
                     <Download size={16} /> Descargar

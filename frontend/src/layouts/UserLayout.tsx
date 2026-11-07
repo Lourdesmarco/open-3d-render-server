@@ -8,6 +8,7 @@ import {
   // Settings,
   LogOut,
   PanelLeftClose,
+  Users,
   Box,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -61,10 +62,17 @@ export default function UserLayout() {
               {!collapsed && <span>Proyectos</span>}
             </NavLink> */}
 
-            <NavLink to="/app/jobs" title="Mis renders">
+            <NavLink to="/app/jobs" title="Tus renders">
               <Layers3 size={19} />
               {!collapsed && <span>Tus renders</span>}
             </NavLink>
+            
+            {user?.role === 'admin' && (
+              <NavLink to="/app/users" title="Usuarios">
+                <Users size={18} />
+                <span>Gestión Usuarios</span>
+              </NavLink>
+            )}
 
             <button 
               onClick={handleLogout} 

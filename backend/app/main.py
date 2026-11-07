@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.routes import router
+from app.api.admin_routes import router as admin_router
 from app.services.job_manager import initialize_database
 
 
@@ -35,6 +36,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(admin_router, prefix="/api")
 
 
 @app.get("/health")

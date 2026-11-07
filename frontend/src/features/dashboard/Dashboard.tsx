@@ -114,7 +114,7 @@ export default function Dashboard() {
         </div>
 
         <button
-          className="new-render-button"
+          className="btn btn-primary"
           onClick={() => navigate('/app/jobs')}
         >
           <Plus size={19} />
@@ -269,7 +269,7 @@ export default function Dashboard() {
                   {job.result_available ? (
                     <button
                       type="button"
-                      className="download-button"
+                      className="btn-action"
                       onClick={() => void downloadRenderJob(job.id, job.filename)}
                     >
                       <Download size={16} /> Descargar

@@ -166,24 +166,7 @@
   justify-content: flex-end;
 }
 
-.download-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: rgba(54, 228, 82, 0.1);
-  border: 1px solid rgba(54, 228, 82, 0.25);
-  color: #36E452;
-  font-size: 10px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.2s;
-}
 
-.download-button:hover {
-  background: #36E452;
-  color: #101411;
-}
 
 .error-text {
   color: #FF6868;

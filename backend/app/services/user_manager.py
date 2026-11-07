@@ -13,7 +13,7 @@ def create_user(
     password: str,
     role: str = "student"
 ):
-    if role not in {"student", "professor", "admin"}:
+    if role not in {"student", "admin"}:
         raise ValueError("Rol no válido")
 
     username = username.strip().lower()
@@ -73,3 +73,47 @@ def get_user_by_username(username: str):
 
 def verify_password(password: str, password_hash: str) -> bool:
     return password_hasher.verify(password, password_hash)
+
+
+def get_all_users() -> list[dict]:
+    """
+    Obtiene todos los usuarios registrados en la base de datos (excluyendo la contraseña).
+    """
+    with get_connection() as db:
+        rows = db.execute("""
+            SELECT id, username, role, active, created_at
+            FROM users
+            ORDER BY created_at DESC
+        """).fetchall()
+
+    return [dict(row) for row in rows]
+
+
+def update_role(user_id: str, new_role: str) -> bool:
+    """
+    Actualiza el rol de un usuario ('student', 'admin').
+    """
+    if new_role not in {"student", "admin"}:
+        raise ValueError("Rol no válido")
+
+    with get_connection() as db:
+        cursor = db.execute("""
+            UPDATE users
+            SET role = ?
+            WHERE id = ?
+        """, (new_role, user_id))
+
+    return cursor.rowcount > 0
+
+
+def delete_user(user_id: str) -> bool:
+    """
+    Elimina a un usuario de la base de datos por su ID.
+    """
+    with get_connection() as db:
+        cursor = db.execute("""
+            DELETE FROM users
+            WHERE id = ?
+        """, (user_id,))
+
+    return cursor.rowcount > 0

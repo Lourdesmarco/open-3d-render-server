@@ -512,6 +512,93 @@
   letter-spacing: -1px;
 }
 
+.login-error {
+  color: #ff6868;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+
+/* src/index.css - Estilos globales de botones */
+
+
+.btn {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary{
+  background-color: var(--green);
+  color: black;
+  border: 1px solid var(--green);
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--green);
+  transform: translateY(-1px);
+}
+
+.btn-secondary{
+  background-color: var(--line);
+  color: white;
+  border: 1px solid white;
+}
+
+.btn-secondary:hover {
+  background-color: transparent;
+  transform: translateY(-1px);
+}
+
+.btn-close{
+  background-color: transparent;
+  border: none;
+  padding: .5em .8em;
+}
+.btn-close:hover {
+  background-color: var(--line);
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(54, 228, 82, 0.1);
+  border: 1px solid rgba(54, 228, 82, 0.25);
+  color: #36E452;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  background: #36E452;
+  color: #101411;
+}
+
+
 /* RESPONSIVE */
 
 @media (max-width: 900px) {
@@ -608,8 +695,3 @@
   }
 }
 
-.login-error {
-  color: #ff6868;
-  font-size: 13px;
-  margin-top: 12px;
-}

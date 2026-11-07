@@ -15,6 +15,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import UserLayout from './layouts/UserLayout';
 import Dashboard from './features/dashboard/Dashboard';
 import Jobs from './features/jobs/Jobs';
+import AdminUsers from './features/admin/AdminUsers';
+import AdminRoute from './auth/AdminRoute';
 import { useAuth } from './auth/AuthContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import { AuthProvider } from './auth/AuthContext';
@@ -209,7 +211,7 @@ function Login() {
               </div>
 
               <button
-                className="submit-button"
+                className="btn-primary"
                 type="submit"
                 disabled={isSubmitting}
               >
@@ -304,6 +306,10 @@ function AppRoutes() {
         <Route path="/app" element={<UserLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="jobs" element={<Jobs />} />
+
+          <Route element={<AdminRoute />}>
+            <Route path="users" element={<AdminUsers />} /> {/* Queda como /app/users */}
+          </Route>
         </Route>
       </Route>
 

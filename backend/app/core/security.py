@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -102,3 +101,11 @@ def require_roles(*roles: str):
         return user
 
     return role_checker
+
+def require_admin(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para realizar esta acción."
+        )
+    return current_user
