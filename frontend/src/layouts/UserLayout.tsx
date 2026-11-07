@@ -55,7 +55,7 @@ export default function UserLayout() {
 
             <NavLink to="/app/jobs" title="Mis renders">
               <Layers3 size={19} />
-              {!collapsed && <span>Mis renders</span>}
+              {!collapsed && <span>Tus renders</span>}
             </NavLink>
           </nav>
         </div>

@@ -14,6 +14,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import UserLayout from './layouts/UserLayout';
 import Dashboard from './features/dashboard/Dashboard';
+import Jobs from './features/jobs/Jobs';
 import { useAuth } from './auth/AuthContext';
 import ProtectedRoute from './auth/ProtectedRoute';
 import { AuthProvider } from './auth/AuthContext';
@@ -275,6 +276,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/app" element={<UserLayout />}>
               <Route index element={<Dashboard />} />
+              <Route path="jobs" element={<Jobs />} />
             </Route>
           </Route>
 

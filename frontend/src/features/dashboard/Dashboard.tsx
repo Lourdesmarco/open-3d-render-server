@@ -104,8 +104,8 @@ export default function Dashboard() {
           </h1>
 
           <p className="dashboard-subtitle">
-            Gestiona tus proyectos y supervisa tus
-            trabajos de renderizado.
+            Gestiona tus proyectos, revisa tus estadísticas
+            y supervisa tu actividad.
           </p>
         </div>
 

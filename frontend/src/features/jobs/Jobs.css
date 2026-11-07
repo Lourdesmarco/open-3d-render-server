@@ -1,0 +1,230 @@
+/* =====================================
+   JOBS & RENDER MANAGEMENT
+   ===================================== */
+
+.jobs-container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  color: #F1F2ED;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.jobs-container h2 {
+  margin: 0 0 18px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+/* UPLOAD SECTION */
+
+.upload-section {
+  background: #191D19;
+  border: 1px solid #303832;
+  padding: 28px;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.file-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 20px;
+  border: 1px dashed #353B34;
+  background: #111411;
+  color: #929B90;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-dropzone:hover {
+  border-color: #36E452;
+  color: #F1F2ED;
+  background: #151A15;
+}
+
+.file-dropzone svg {
+  color: #36E452;
+}
+
+.submit-button {
+  align-self: flex-end;
+  min-height: 46px;
+  padding: 0 24px;
+  background: #36E452;
+  border: 1px solid #36E452;
+  color: #101411;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: transparent;
+  color: #36E452;
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin-top: 14px;
+  color: #FF6868;
+  font-size: 12px;
+}
+
+/* JOBS LIST TABLE */
+
+.jobs-list-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.jobs-table {
+  border: 1px solid #303832;
+  background: #191D19;
+}
+
+.jobs-table-header,
+.jobs-table .job-row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.5fr 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.jobs-table-header {
+  background: #202620;
+  color: #929B90;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.jobs-table .job-row {
+  min-height: 64px;
+  border-top: 1px solid #303832;
+}
+
+.jobs-table .job-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #E8ECE6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jobs-table .job-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.jobs-table .job-status.queued {
+  color: #D8A85B;
+}
+
+.jobs-table .job-status.processing {
+  color: #36E452;
+}
+
+.jobs-table .job-status.completed {
+  color: #929B90;
+}
+
+.jobs-table .job-status.failed {
+  color: #FF6868;
+}
+
+.jobs-table .job-date {
+  color: #858D82;
+  font-size: 11px;
+}
+
+.jobs-table .job-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(54, 228, 82, 0.1);
+  border: 1px solid rgba(54, 228, 82, 0.25);
+  color: #36E452;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.download-button:hover {
+  background: #36E452;
+  color: #101411;
+}
+
+.error-text {
+  color: #FF6868;
+  font-size: 10px;
+  cursor: help;
+  text-decoration: underline dotted;
+}
+
+/* ANIMATIONS */
+
+.spin {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .jobs-table-header {
+    display: none;
+  }
+
+  .jobs-table .job-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .jobs-table .job-name {
+    grid-column: 1 / -1;
+  }
+
+  .jobs-table .job-actions {
+    justify-content: flex-start;
+  }
+}
