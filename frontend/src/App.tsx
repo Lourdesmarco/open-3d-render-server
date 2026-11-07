@@ -152,7 +152,7 @@ function Login() {
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="field">
                 <label htmlFor="email">
-                  USUARIO O CORREO ELECTRÓNICO
+                  USUARIO
                 </label>
 
                 <div className="input-container">
@@ -161,7 +161,7 @@ function Login() {
                   <input
                     id="email"
                     type="text"
-                    placeholder="usuario@universidad.es"
+                    placeholder="Introduce tu usuario"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="username"

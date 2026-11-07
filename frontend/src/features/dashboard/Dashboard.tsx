@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardSummary, type DashboardSummary } from './Dashboard.api';
 import { downloadRenderJob } from '../jobs/Jobs.api';
-import type { CSSProperties } from 'react';
+//import type { CSSProperties } from 'react';
 import {
   AlertCircle,
   ArrowRight,
@@ -13,35 +13,35 @@ import {
   Clock3,
   Cpu,
   Download,
-  Layers3,
+  // Layers3,
   Plus,
   RefreshCw
 } from 'lucide-react';
 import './Dashboard.css';
 
-const projects = [
-  {
-    name: 'Proyecto de tipografía',
-    category: 'TIPOGRAFIA',
-    renders: 8,
-    updated: 'Hace 20 minutos',
-    color: '#36E452',
-  },
-  {
-    name: 'Diseño de producto',
-    category: 'DISEÑO DE PRODUCTO',
-    renders: 5,
-    updated: 'Ayer',
-    color: '#D8A7FF',
-  },
-  {
-    name: 'Espacio experimental',
-    category: 'EXPERIMENTACIÓN',
-    renders: 5,
-    updated: 'Hace 3 días',
-    color: '#E9B85D',
-  },
-];
+// const projects = [
+//   {
+//     name: 'Proyecto de tipografía',
+//     category: 'TIPOGRAFIA',
+//     renders: 8,
+//     updated: 'Hace 20 minutos',
+//     color: '#36E452',
+//   },
+//   {
+//     name: 'Diseño de producto',
+//     category: 'DISEÑO DE PRODUCTO',
+//     renders: 5,
+//     updated: 'Ayer',
+//     color: '#D8A7FF',
+//   },
+//   {
+//     name: 'Espacio experimental',
+//     category: 'EXPERIMENTACIÓN',
+//     renders: 5,
+//     updated: 'Hace 3 días',
+//     color: '#E9B85D',
+//   },
+// ];
 
 
 
@@ -176,7 +176,7 @@ export default function Dashboard() {
       </section>
 
       {/* PROJECTS */}
-      <section className="projects-section">
+      {/* <section className="projects-section">
         <div className="section-heading">
           <div>
             <p className="dashboard-eyebrow">TRABAJO PERSONAL</p>
@@ -222,7 +222,7 @@ export default function Dashboard() {
             </article>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* RECENT JOBS */}
       <section className="jobs-section">

@@ -3,10 +3,9 @@ import { useAuth } from '../auth/AuthContext';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  FolderKanban,
   Layers3,
-  UserRound,
-  Settings,
+  // UserRound,
+  // Settings,
   LogOut,
   PanelLeftClose,
   Box,
@@ -57,19 +56,28 @@ export default function UserLayout() {
               {!collapsed && <span>Dashboard</span>}
             </NavLink>
 
-            <NavLink to="/app/projects" title="Proyectos">
+            {/* <NavLink to="/app/projects" title="Proyectos">
               <FolderKanban size={19} />
               {!collapsed && <span>Proyectos</span>}
-            </NavLink>
+            </NavLink> */}
 
             <NavLink to="/app/jobs" title="Mis renders">
               <Layers3 size={19} />
               {!collapsed && <span>Tus renders</span>}
             </NavLink>
+
+            <button 
+              onClick={handleLogout} 
+              className="logout-button"
+              aria-label="Cerrar sesión"
+              >
+              <LogOut size={18} />
+              <span>Cerrar sesión</span>
+            </button>
           </nav>
         </div>
 
-        <div className="sidebar-bottom">
+        {/* <div className="sidebar-bottom">
           <div className="sidebar-section">
             {!collapsed && <p>CUENTA</p>}
 
@@ -85,16 +93,7 @@ export default function UserLayout() {
               </NavLink>
             </nav>
           </div>
-
-          <button 
-          onClick={handleLogout} 
-          className="logout-button"
-          aria-label="Cerrar sesión"
-          >
-            <LogOut size={18} />
-            <span>Cerrar sesión</span>
-          </button>
-        </div>
+        </div> */}
 
       </aside>
 
@@ -106,7 +105,7 @@ export default function UserLayout() {
           </div>
 
           <div className="header-user">
-            <div className="user-avatar">LM</div>
+            <div className="user-avatar">U</div>
             {!collapsed && (
               <div className="user-details">
                 <strong>{user?.username ?? 'Usuario demo'}</strong>
