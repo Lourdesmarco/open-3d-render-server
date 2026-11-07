@@ -15,7 +15,7 @@ import { useState } from 'react';
 import './UserLayout.css';
 
 export default function UserLayout() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -109,8 +109,8 @@ export default function UserLayout() {
             <div className="user-avatar">LM</div>
             {!collapsed && (
               <div className="user-details">
-                <strong>Usuario de prueba</strong>
-                <span>Estudiante</span>
+                <strong>{user?.username ?? 'Usuario demo'}</strong>
+                <span>{user?.role ?? 'admin'}</span>
               </div>
             )}
           </div>

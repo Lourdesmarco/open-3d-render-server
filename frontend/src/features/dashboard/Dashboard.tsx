@@ -1,39 +1,23 @@
 
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getDashboardSummary, type DashboardSummary } from './Dashboard.api';
+import { downloadRenderJob } from '../jobs/Jobs.api';
 import type { CSSProperties } from 'react';
 import {
+  AlertCircle,
   ArrowRight,
   ArrowUpRight,
+  Box,
+  CheckCircle2, 
   Clock3,
   Cpu,
-  FolderKanban,
+  Download,
   Layers3,
   Plus,
-  RefreshCw,
-  CheckCircle2,
-  CircleDot
+  RefreshCw
 } from 'lucide-react';
 import './Dashboard.css';
-
-const stats = [
-  {
-    label: 'TRABAJOS EN COLA',
-    value: '03',
-    detail: 'Pendientes de procesamiento',
-    icon: Clock3,
-  },
-  {
-    label: 'RENDERS ACTIVOS',
-    value: '02',
-    detail: 'Procesándose actualmente',
-    icon: RefreshCw,
-  },
-  {
-    label: 'COMPLETADOS',
-    value: '18',
-    detail: 'Trabajos finalizados',
-    icon: CheckCircle2,
-  },
-];
 
 const projects = [
   {
@@ -59,34 +43,37 @@ const projects = [
   },
 ];
 
-const jobs = [
-  {
-    name: 'tipo_final.blend',
-    project: 'Proyecto de tipografia',
-    status: 'Renderizando',
-    progress: 68,
-    time: '12 min',
-    type: 'active',
-  },
-  {
-    name: 'product_view_03.blend',
-    project: 'Diseño de producto',
-    status: 'En cola',
-    progress: 0,
-    time: 'En espera',
-    type: 'queued',
-  },
-  {
-    name: 'exterior_scene.blend',
-    project: 'Proyecto experimental',
-    status: 'Completado',
-    progress: 100,
-    time: 'Hace 2 horas',
-    type: 'completed',
-  },
-];
+
 
 export default function Dashboard() {
+
+  const navigate = useNavigate();
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      try {
+        setLoading(true);
+        const data = await getDashboardSummary();
+        setSummary(data);
+      } catch (err) {
+        console.error('Error cargando el dashboard:', err);
+        setError('No se pudieron obtener los datos del servidor.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadDashboard();
+  }, []);
+
+  if (loading) return <div className="dashboard-loading">Cargando métricas...</div>;
+  if (error || !summary) return <div className="dashboard-error">{error}</div>;
+
+  const { stats, recent_jobs } = summary;
+
   return (
     <div className="dashboard">
 
@@ -128,7 +115,7 @@ export default function Dashboard() {
 
         <button
           className="new-render-button"
-          onClick={() => alert('La creación de renders estará disponible próximamente.')}
+          onClick={() => navigate('/app/jobs')}
         >
           <Plus size={19} />
           Nuevo trabajo
@@ -144,28 +131,47 @@ export default function Dashboard() {
           <div>
             <p className="dashboard-eyebrow">TU ACTIVIDAD</p>
             <h2>Resumen<span>.</span></h2>
+            <div className="stat-card-top">
+              <Box size={18} />
+              <span>TOTAL TRABAJOS</span>
+              <strong>{stats.total}</strong>
+              <p>Activos, en cola y completados</p>
+            </div>
           </div>
 
           <span className="section-index">01 / 03</span>
         </div>
 
         <div className="stats-grid">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
 
-            return (
-              <article className="stat-card" key={stat.label}>
-                <div className="stat-card-top">
-                  <span>{stat.label}</span>
-                  <Icon size={18} />
-                </div>
+          <article className="stat-card">
+            <div className="stat-card-top">
+              <span>TRABAJOS EN COLA</span>
+              <Clock3 size={18} />
+            </div>
+            <strong>{stats.queued}</strong>
+            <p>Pendientes de procesamiento</p>
+          </article>
 
-                <strong>{stat.value}</strong>
+          <article className="stat-card">
+            <div className="stat-card-top">
+              <span>RENDERS ACTIVOS</span>
+              <RefreshCw size={18} />
+            </div>
+            <strong>{stats.processing}</strong>
+            <p>Procesándose actualmente</p>
+            
+          </article>
 
-                <p>{stat.detail}</p>
-              </article>
-            );
-          })}
+          <article className="stat-card">
+            <div className="stat-card-top">
+              <span>COMPLETADOS</span>
+              <CheckCircle2 size={18} />
+            </div>
+            <strong>{stats.completed}</strong>
+            <p>Trabajos finalizados</p>
+          </article>
+
         </div>
       </section>
 
@@ -226,54 +232,57 @@ export default function Dashboard() {
             <h2>Actividad reciente<span>.</span></h2>
           </div>
 
-          <button className="text-link" type="button">
+          <button 
+            className="text-link" 
+            type="button"
+            onClick={() => navigate('/app/jobs')}
+          >
             Ver historial <ArrowRight size={16} />
           </button>
         </div>
+        
+        {recent_jobs.length === 0 ? (
+          <p className="empty-message">Aún no hay trabajos de render creados.</p>
+        ) : (
+          <div className="jobs-table">
+            <div className="jobs-table-header">
+              <span>ARCHIVO</span>
+              <span>ESTADO</span>
+              <span>FECHA</span>
+              <span>ACCIONES</span>
+            </div>
 
-        <div className="jobs-table">
-          <div className="jobs-table-header">
-            <span>TRABAJO</span>
-            <span>ESTADO</span>
-            <span>PROGRESO</span>
-            <span>ACTUALIZACIÓN</span>
+            {recent_jobs.map((job) => (
+              <div className="job-row" key={job.id}>
+                <span className="job-name">{job.filename}</span>
+                <span className={`job-status ${job.status}`}>
+                  {job.status === 'processing' && <RefreshCw size={14} className="spin" />}
+                  {job.status === 'queued' && <Clock3 size={14} />}
+                  {job.status === 'completed' && <CheckCircle2 size={14} />}
+                  {job.status === 'failed' && <AlertCircle size={14} />}
+                  {job.status}
+                </span>
+                <span className="job-date">
+                  {new Date(job.created_at).toLocaleString()}
+                </span>
+                <span className="job-actions">
+                  {job.result_available ? (
+                    <button
+                      type="button"
+                      className="download-button"
+                      onClick={() => void downloadRenderJob(job.id, job.filename)}
+                    >
+                      <Download size={16} /> Descargar
+                    </button>
+                  ) : (
+                    <span className="no-action">-</span>
+                  )}
+                </span>
+              </div>
+            ))}
           </div>
-
-          {jobs.map((job) => (
-            <article className="job-row" key={job.name}>
-              <div className="job-name">
-                <div className="job-file-icon">
-                  <FolderKanban size={17} />
-                </div>
-
-                <div>
-                  <strong>{job.name}</strong>
-                  <span>{job.project}</span>
-                </div>
-              </div>
-
-              <div className={`job-status ${job.type}`}>
-                {job.type === 'active' && <RefreshCw size={14} />}
-                {job.type === 'queued' && <CircleDot size={14} />}
-                {job.type === 'completed' && <CheckCircle2 size={14} />}
-                {job.status}
-              </div>
-
-              <div className="job-progress">
-                <div className="progress-track">
-                  <div
-                    className="progress-value"
-                    style={{ width: `${job.progress}%` }}
-                  />
-                </div>
-
-                <span>{job.progress}%</span>
-              </div>
-
-              <span className="job-time">{job.time}</span>
-            </article>
-          ))}
-        </div>
+        )}
+        
       </section>
 
       {/* INFRASTRUCTURE NOTE */}

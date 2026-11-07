@@ -194,3 +194,35 @@ def get_me(user=Depends(get_current_user)):
         "role": user["role"],
         "active": bool(user["active"])
     }
+
+
+@router.get("/dashboard/summary")
+def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
+    user_id = current_user["id"]
+    role = current_user.get("role", "user")
+
+    # 1. Obtener la lista de trabajos segun el rol
+    if role == "admin":
+        jobs = job_manager.list_jobs()
+    else:
+        jobs = job_manager.list_jobs(owner_id=user_id)
+
+    # 2. Calcular metricas exactas
+    total_jobs = len(jobs)
+    queued_jobs = sum(1 for j in jobs if j.get("status") == "queued")
+    processing_jobs = sum(1 for j in jobs if j.get("status") == "processing")
+    completed_jobs = sum(1 for j in jobs if j.get("status") == "completed")
+    failed_jobs = sum(1 for j in jobs if j.get("status") == "failed")
+
+    # 3. Formatear la respuesta
+    return {
+        "stats": {
+            "total": total_jobs,
+            "queued": queued_jobs,
+            "processing": processing_jobs,
+            "completed": completed_jobs,
+            "failed": failed_jobs,
+        },
+        # Devuelve los 5 trabajos mas recientes para el historial rápido
+        "recent_jobs": [public_job(job) for job in jobs[:5]]
+    }
