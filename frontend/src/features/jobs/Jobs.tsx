@@ -1,26 +1,25 @@
 import { useState, useEffect, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import { Upload, Download, RefreshCw, AlertCircle, CheckCircle2, Clock3 } from 'lucide-react';
-import { useAuth } from '../../auth/AuthContext';
 import { getJobsRequest, uploadJobRequest, downloadRenderJob } from './Jobs.api';
 import type { RenderJob } from './types';
 import './Jobs.css';
 
 export default function Jobs() {
-  const { token } = useAuth();
+
   const [jobs, setJobs] = useState<RenderJob[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchJobs = useCallback(async () => {
-    if (!token) return;
+    
     try {
-      const data = await getJobsRequest(token);
+      const data = await getJobsRequest();
       setJobs(data);
     } catch (err) {
       console.error("Error al obtener renders:", err);
     }
-  }, [token]);
+  }, []);
 
   // Polling automático cada 3 segundos si hay trabajos pendientes o en proceso
   useEffect(() => {
@@ -50,13 +49,13 @@ export default function Jobs() {
 
   const handleUpload = async (e: FormEvent) => {
     e.preventDefault();
-    if (!selectedFile || !token) return;
+    if (!selectedFile) return;
 
     setUploading(true);
     setError(null);
 
     try {
-      await uploadJobRequest(selectedFile, token);
+      await uploadJobRequest(selectedFile);
       setSelectedFile(null);
       await fetchJobs();
     } catch (err) {
@@ -144,7 +143,7 @@ export default function Jobs() {
                   <button
                     type="button"
                     className="download-button"
-                    onClick={() => downloadRenderJob(job.id, job.filename, token!)}
+                    onClick={() => downloadRenderJob(job.id, job.filename)}
                   >
                     <Download size={16} /> Descargar
                   </button>
