@@ -5,7 +5,7 @@ import {
   Box,
   Eye,
   EyeOff,
-  Fingerprint,
+  //Fingerprint,
   LockKeyhole,
   Mail,
   ShieldCheck,
@@ -149,6 +149,12 @@ function Login() {
               de renderizado de la escuela.
             </p>
 
+            <div className="access-security">
+              <ShieldCheck size={16} />
+              <span>Acceso exclusivo para usuarios autorizados</span>
+              <p></p>
+            </div>
+
             <form className="login-form" onSubmit={handleSubmit}>
               <div className="field">
                 <label htmlFor="email">
@@ -219,7 +225,7 @@ function Login() {
               </p>
             )}
 
-            <div className="alternative">
+            {/* <div className="alternative">
               <span />
               <p>O UTILIZA TU CERTIFICADO DIGITAL</p>
               <span />
@@ -229,12 +235,9 @@ function Login() {
               <Fingerprint size={22} strokeWidth={1.6} />
               <span>Acceder con certificado digital</span>
               <ArrowUpRight size={17} />
-            </button>
+            </button> */}
 
-            <div className="access-security">
-              <ShieldCheck size={16} />
-              <span>Acceso exclusivo para usuarios autorizados</span>
-            </div>
+            
 
 
             
@@ -252,7 +255,7 @@ function Login() {
       {/* FOOTER */}
       <footer className="site-footer">
         <div>
-          <span className="footer-mark">O3D.</span>
+          <span className="footer-mark">O3DR.</span>
           <span>OPEN 3D RENDER · ESD MADRID</span>
         </div>
 

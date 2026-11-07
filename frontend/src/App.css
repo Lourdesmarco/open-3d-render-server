@@ -443,7 +443,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-top: 28px;
+  margin-bottom: 28px;
   color: var(--muted);
   font-size: 10px;
 }

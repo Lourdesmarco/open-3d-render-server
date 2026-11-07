@@ -122,7 +122,7 @@ export default function Dashboard() {
           <ArrowUpRight size={17} />
         </button>
 
-        <div className="banner-decoration">RF.</div>
+        <div className="banner-decoration">O3DR.</div>
       </section>
 
       {/* STATISTICS */}
