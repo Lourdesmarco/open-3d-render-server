@@ -32,10 +32,11 @@ class Settings:
         os.getenv("MAX_UPLOAD_SIZE_MB", "500")
     )
 
-    BLENDER_EXECUTABLE = os.getenv(
-        "BLENDER_EXECUTABLE", ""
-    )
-
+    BLENDER_EXECUTABLE = os.getenv("BLENDER_EXECUTABLE", "")
+    C4D_EXECUTABLE: str = os.getenv("C4D_EXECUTABLE", "")
+    MAYA_EXECUTABLE: str = os.getenv("MAYA_EXECUTABLE", "")
+    AFTER_EFFECTS_EXECUTABLE: str = os.getenv("AFTER_EFFECTS_EXECUTABLE", "")
+    
     RENDER_TIMEOUT_SECONDS = int(
         os.getenv("RENDER_TIMEOUT_SECONDS", "3600")
     )

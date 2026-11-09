@@ -1,15 +1,21 @@
-import { useState, useEffect, useCallback, type ChangeEvent, type FormEvent } from 'react';
-import { Upload, Download, RefreshCw, AlertCircle, CheckCircle2, Clock3 } from 'lucide-react';
+import { useState, useEffect, useCallback, type FormEvent } from 'react';
+import { Upload, Download, RefreshCw, AlertCircle, CheckCircle2, Clock3, Settings } from 'lucide-react';
 import { getJobsRequest, uploadJobRequest, downloadRenderJob } from './Jobs.api';
 import type { RenderJob } from './types';
 import './Jobs.css';
+
+// Formatos soportados por nuestra arquitectura modular
+const SUPPORTED_EXTENSIONS = ['.blend', '.c4d', '.ma', '.mb', '.aep'];
+const ACCEPT_ATTRIBUTE = SUPPORTED_EXTENSIONS.join(',');
 
 export default function Jobs() {
 
   const [jobs, setJobs] = useState<RenderJob[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [detectedEngine, setDetectedEngine] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const fetchJobs = useCallback(async () => {
     
@@ -35,16 +41,40 @@ export default function Jobs() {
     return () => clearInterval(interval);
   }, [fetchJobs, jobs]);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (!file.name.endsWith('.blend')) {
-        setError('Solo se permiten archivos .blend');
-        return;
-      }
-      setSelectedFile(file);
-      setError(null);
+
+  const getEngineName = (extension: string): string => {
+    switch (extension.toLowerCase()) {
+      case '.blend': return 'Blender Render Engine';
+      case '.c4d': return 'Cinema 4D Commandline Engine';
+      case '.ma':
+      case '.mb': return 'Autodesk Maya (Arnold Engine)';
+      case '.aep': return 'Adobe After Effects (aerender)';
+      default: return 'Motor Desconocido';
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError(null);
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      setSelectedFile(null);
+      setDetectedEngine(null);
+      return;
+    }
+
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+
+    if (!SUPPORTED_EXTENSIONS.includes(ext)) {
+      setFileError(`Formato no soportado (${ext}). Formatos válidos: ${SUPPORTED_EXTENSIONS.join(', ')}`);
+      setSelectedFile(null);
+      setDetectedEngine(null);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    setSelectedFile(file);
+    setDetectedEngine(getEngineName(ext));
   };
 
   const handleUpload = async (e: FormEvent) => {
@@ -92,19 +122,29 @@ export default function Jobs() {
         </div>
       </section>
       <section className="upload-section">
-        <h2>Nuevo Render (.blend)</h2>
+        <h2>Nuevo Render (.blend, .c4d, .ma, .mb, .aep)</h2>
         <form onSubmit={handleUpload} className="upload-form">
           <input
             type="file"
-            accept=".blend"
+            accept={ACCEPT_ATTRIBUTE}
             id="file-upload"
             onChange={handleFileChange}
             style={{ display: 'none' }}
           />
+          
           <label htmlFor="file-upload" className="file-dropzone">
             <Upload size={24} />
-            <span>{selectedFile ? selectedFile.name : 'Haz clic para seleccionar un archivo .blend'}</span>
+            <span>{selectedFile ? selectedFile.name : 'Haz clic para seleccionar un archivo'}</span>
           </label>
+
+          {fileError && <p className="error-message" style={{ color: '#ef4444', marginTop: '8px' }}>{fileError}</p>}
+
+          {selectedFile && detectedEngine && (
+            <div className="file-preview-card">
+              <Settings size={16} className="engine-icon"/> 
+              <strong>Motor asignado:</strong> {detectedEngine}
+            </div>
+          )}
 
           <button 
             type="submit" 

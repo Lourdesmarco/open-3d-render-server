@@ -175,6 +175,15 @@
   text-decoration: underline dotted;
 }
 
+.file-preview-card{
+  display: flex;
+  align-items: center;
+}
+.file-preview-card .engine-icon{
+  color: var(--green);
+  margin-right: .5em;
+}
+
 /* ANIMATIONS */
 
 .spin {
