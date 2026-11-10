@@ -9,7 +9,7 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.services import job_manager
-from app.services.blender_engine import render_project
+from app.services.render_engines.render_engine import render_project
 
 
 WORKER_ID = (
@@ -30,11 +30,14 @@ def process_job(job):
     job_id = job["id"]
 
     project_path = Path(job["project_path"])
-
+    render_type = job.get("render_type", "2d")
+    
+    ext = ".mp4" if render_type == "video" else ".png"
+    
     output_path = (
         settings.STORAGE_PATH
         / "renders"
-        / f"{job_id}.png"
+        / f"{job_id}{ext}"
     )
 
     log_path = (
@@ -55,7 +58,8 @@ def process_job(job):
             project_path=project_path,
             output_path=output_path,
             log_path=log_path,
-            timeout=settings.RENDER_TIMEOUT_SECONDS
+            timeout=settings.RENDER_TIMEOUT_SECONDS,
+            render_type=render_type
         )
 
         job_manager.finish_job(

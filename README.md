@@ -54,8 +54,6 @@ JWT_SECRET_KEY="your_generated_secret_key_here"
 JWT_ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
 
-# Database Connection
-DATABASE_URL="sqlite:///./render_farm.db"
 
 # Render Engine Executables (Optional - leave empty for automatic PATH discovery)
 BLENDER_EXECUTABLE=""

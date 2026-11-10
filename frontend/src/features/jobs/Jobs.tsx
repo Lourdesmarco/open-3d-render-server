@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
-import { Upload, Download, RefreshCw, AlertCircle, CheckCircle2, Clock3, Settings } from 'lucide-react';
-import { getJobsRequest, uploadJobRequest, downloadRenderJob } from './Jobs.api';
+import { Upload, Download, RefreshCw, AlertCircle, CheckCircle2, Clock3, Settings, Image, Film, Trash2 } from 'lucide-react';
+import { getJobsRequest, uploadJobRequest, downloadRenderJob, deleteJobRequest } from './Jobs.api';
 import type { RenderJob } from './types';
 import './Jobs.css';
 
@@ -16,6 +16,7 @@ export default function Jobs() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [renderType, setRenderType] = useState<'2d' | 'video'>('2d');
 
   const fetchJobs = useCallback(async () => {
     
@@ -85,13 +86,25 @@ export default function Jobs() {
     setError(null);
 
     try {
-      await uploadJobRequest(selectedFile);
+      await uploadJobRequest(selectedFile, renderType);
       setSelectedFile(null);
       await fetchJobs();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al subir el proyecto');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar este trabajo?')) return;
+
+    try {
+      await deleteJobRequest(jobId);
+      // Actualizar la lista local filtrando el trabajo eliminado
+      setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+    } catch (err) {
+      alert('No se pudo eliminar el trabajo de renderizado');
     }
   };
 
@@ -146,6 +159,36 @@ export default function Jobs() {
             </div>
           )}
 
+          {/* SELECTOR DE TIPO DE RENDER */}
+          <div className="render-type-selector">
+            <label className="section-label">Tipo de Salida:</label>
+            <div className="radio-group">
+              <label className={`radio-card ${renderType === '2d' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="renderType"
+                  value="2d"
+                  checked={renderType === '2d'}
+                  onChange={() => setRenderType('2d')}
+                />
+                <Image size={18} />
+                <span>Imagen 2D (Fija)</span>
+              </label>
+
+              <label className={`radio-card ${renderType === 'video' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="renderType"
+                  value="video"
+                  checked={renderType === 'video'}
+                  onChange={() => setRenderType('video')}
+                />
+                <Film size={18} />
+                <span>Video / Animación</span>
+              </label>
+            </div>
+          </div>
+
           <button 
             type="submit" 
             className="btn btn-primary" 
@@ -162,6 +205,7 @@ export default function Jobs() {
         <div className="jobs-table">
           <div className="jobs-table-header">
             <span>ARCHIVO</span>
+            <span>TIPO</span>
             <span>ESTADO</span>
             <span>FECHA</span>
             <span>ACCIONES</span>
@@ -170,6 +214,17 @@ export default function Jobs() {
           {jobs.map((job) => (
             <div className="job-row" key={job.id}>
               <span className="job-name">{job.filename}</span>
+              <span className="job-type">
+                {job.render_type === 'video' ? (
+                  <span className="badge badge-video">
+                    <Film size={12} /> Vídeo
+                  </span>
+                ) : (
+                  <span className="badge badge-2d">
+                    <Image size={12} /> Imagen
+                  </span>
+                )}
+              </span>
               <span className={`job-status ${job.status}`}>
                 {job.status === 'processing' && <RefreshCw size={14} className="spin" />}
                 {job.status === 'queued' && <Clock3 size={14} />}
@@ -189,6 +244,14 @@ export default function Jobs() {
                   </button>
                 )}
                 {job.error && <span className="error-text" title={job.error}>Ver error</span>}
+                <button
+                  type="button"
+                  className="btn-action btn-delete"
+                  onClick={() => handleDeleteJob(job.id)}
+                  title="Eliminar trabajo"
+                >
+                  <Trash2 size={16} />
+                </button>
               </span>
             </div>
           ))}

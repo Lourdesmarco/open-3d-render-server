@@ -19,7 +19,8 @@ class BaseRenderEngine(ABC):
         project_path: Path,
         output_path: Path,
         log_path: Path,
-        timeout: int
+        timeout: int,
+        render_type: str = "2d"
     ) -> Path:
         """Ejecuta el renderizado y devuelve la ruta de salida generada."""
         pass

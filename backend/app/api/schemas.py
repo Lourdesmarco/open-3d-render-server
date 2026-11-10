@@ -12,7 +12,7 @@ class JobResponse(BaseModel):
     created_at: datetime
     result_available: bool = False
     error: Optional[str] = None
-
+    render_type: str = "2d"
 
 class LoginRequest(BaseModel):
     username: str

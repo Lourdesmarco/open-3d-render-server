@@ -1,7 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Response
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Response, Form
 from fastapi.responses import FileResponse
 from pathlib import Path
 
@@ -45,13 +45,17 @@ def public_job(job):
         status=job["status"],
         created_at=job["created_at"],
         result_available=bool(job["result_path"]),
-        error=job["error"]
+        error=job["error"],
+        render_type=job.get("render_type", "2d")
     )
 
 
 @router.post("/jobs", response_model=JobResponse)
-async def upload_project(file: UploadFile = File(...), user=Depends(get_current_user)):
-
+async def upload_project(
+    file: UploadFile = File(...), 
+    render_type: str = Form("2d"),
+    user=Depends(get_current_user)):
+    
     try:
         filename, project_path = await storage.save_upload(
             file,
@@ -61,7 +65,8 @@ async def upload_project(file: UploadFile = File(...), user=Depends(get_current_
         job = job_manager.create_job(
             filename,
             project_path,
-            owner_id=user["id"]
+            owner_id=user["id"],
+            render_type=render_type
         )
 
         return public_job(job)
@@ -113,9 +118,10 @@ def get_render_result(job_id: str, user=Depends(get_current_user)):
     if output.parent != render_dir or not output.is_file():
         raise HTTPException(404, "Resultado no disponible")
 
+    media_type = "video/mp4" if output.suffix.lower() in [".mp4", ".mkv"] else "image/png"
     return FileResponse(
         output,
-        media_type="image/png"
+        media_type=media_type
     )
 
 
@@ -135,11 +141,46 @@ def download_render(job_id: str, user=Depends(get_current_user)):
     if output.parent != render_dir or not output.is_file():
         raise HTTPException(404, "Resultado no disponible")
 
+    ext = output.suffix.lower() or ".png"
+    media_type = "video/mp4" if ext in [".mp4", ".mkv"] else "image/png"
+
+    base_name = Path(job["filename"]).stem
+    download_filename = f"{base_name}_render{ext}"
+
     return FileResponse(
         output,
-        media_type="image/png",
-        filename=f"render_{job_id}.png"
+        media_type=media_type,
+        filename=download_filename
     )
+
+
+
+@router.delete("/jobs/{job_id}")
+def delete_job_route(job_id: str, user=Depends(get_current_user)):
+   
+    job = get_authorized_job(job_id, user)
+
+    job_manager.delete_job(job_id)
+
+    files_to_remove = []
+
+    if job.get("project_path"):
+        files_to_remove.append(Path(job["project_path"]))
+    
+    if job.get("result_path"):
+        files_to_remove.append(Path(job["result_path"]))
+    
+    log_path = settings.STORAGE_PATH / "logs" / f"{job_id}.log"
+    files_to_remove.append(log_path)
+
+    for file_path in files_to_remove:
+        try:
+            if file_path and file_path.is_file():
+                file_path.unlink()
+        except Exception as exc:
+            logger.warning(f"No se pudo eliminar el archivo {file_path}: {exc}")
+
+    return {"message": "Trabajo eliminado correctamente"}
 
 
 

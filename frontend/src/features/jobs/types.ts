@@ -11,4 +11,5 @@ export interface RenderJob {
     created_at: string;
     result_available: boolean;
     error: string | null;
+    render_type?: '2d' | 'video';
 }

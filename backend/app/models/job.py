@@ -12,6 +12,7 @@ class RenderJob:
     project_path: str
     result_path: Optional[str] = None
     error: Optional[str] = None
+    render_type = Column(String, default="2d")
 
 
 # initial status

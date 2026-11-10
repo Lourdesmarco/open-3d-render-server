@@ -100,10 +100,12 @@
   background: #191D19;
 }
 
+
+
 .jobs-table-header,
 .jobs-table .job-row {
   display: grid;
-  grid-template-columns: 2fr 1.2fr 1.5fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr;
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
@@ -182,6 +184,79 @@
 .file-preview-card .engine-icon{
   color: var(--green);
   margin-right: .5em;
+}
+
+
+.render-type-selector {
+  margin: 16px 0;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #a1a1aa;
+  margin-bottom: 8px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+}
+
+.radio-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  cursor: pointer;
+  color: #a1a1aa;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.radio-card input[type="radio"] {
+  display: none;
+}
+
+.radio-card:hover {
+  border-color: #3f3f46;
+  color: #f4f4f5;
+}
+
+.radio-card.active {
+  border-color: white;
+  color: white;
+  font-weight: 500;
+}
+
+/* Columna de tipo de render en la tabla */
+
+
+.job-type .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  
+}
+
+.badge-2d {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: rgba(255, 255, 255, .5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.badge-video {
+  background-color: rgba(168, 85, 247, 0.15);
+  color: rgba(255, 255, 255, .5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* ANIMATIONS */

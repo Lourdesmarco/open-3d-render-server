@@ -591,6 +591,7 @@
   font-weight: 700;
   text-decoration: none;
   transition: all 0.2s;
+  margin-left: .5em;
 }
 
 .btn-action:hover {

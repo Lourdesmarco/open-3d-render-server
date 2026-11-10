@@ -39,7 +39,8 @@ def initialize_database():
                 project_path TEXT NOT NULL,
                 result_path TEXT,
                 error TEXT,
-                worker_id TEXT
+                worker_id TEXT,
+                render_type TEXT DEFAULT '2d'
             )
         """)
         columns = {
@@ -54,6 +55,13 @@ def initialize_database():
             db.execute(
                 "ALTER TABLE jobs ADD COLUMN owner_id TEXT"
             )
+        # Migración automática si la tabla ya existía de antes sin esta columna
+        try:
+            db.execute("ALTER TABLE jobs ADD COLUMN render_type TEXT DEFAULT '2d'")
+            db.commit()
+        except Exception:
+            # Si la columna ya existía, SQLite lanzará una excepción que simplemente ignoramos
+            pass
 
         db.execute("""
             CREATE INDEX IF NOT EXISTS idx_jobs_owner
@@ -71,12 +79,22 @@ def initialize_database():
             )
         """)
 
-def create_job(filename: str, project_path: Path, owner_id: str):
+def create_job(
+    filename: str, 
+    project_path: Path, 
+    owner_id: str, 
+    render_type: str = "2d"):
+
     job_id = uuid.uuid4().hex
 
     created_at = datetime.now(
         timezone.utc
     ).isoformat()
+
+    ext = ".mp4" if render_type == "video" else ".png"
+    renders_dir = settings.STORAGE_PATH / "renders"
+    renders_dir.mkdir(parents=True, exist_ok=True)
+    expected_result_path = str(renders_dir / f"render_{job_id}{ext}")
 
     with get_connection() as db:
         db.execute("""
@@ -86,16 +104,20 @@ def create_job(filename: str, project_path: Path, owner_id: str):
                 status,
                 created_at,
                 project_path,
-                owner_id
+                owner_id,
+                render_type,
+                result_path
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             job_id,
             filename,
             "queued",
             created_at,
             str(project_path),
-            owner_id
+            owner_id,
+            render_type,
+            expected_result_path
         ))
 
     return get_job(job_id)
@@ -189,6 +211,17 @@ def claim_next_job(worker_id: str):
         return dict(updated)
 
 
+
+def delete_job(job_id: str):
+    with get_connection() as db: 
+        job = get_job(job_id)
+        if job:
+            db.execute("DELETE FROM jobs WHERE id = ?", (job_id,))
+            db.commit()
+    return job
+
+
+
 def finish_job(job_id: str, result_path: Path):
     update_job(
         job_id,
@@ -198,9 +231,11 @@ def finish_job(job_id: str, result_path: Path):
     )
 
 
+
 def fail_job(job_id: str, error: str):
     update_job(
         job_id,
         status="failed",
         error=error[-4000:]
     )
+

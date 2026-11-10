@@ -1,7 +1,7 @@
 from pathlib import Path
 from app.services.render_engines.base import BaseRenderEngine
 from app.services.render_engines.blender import BlenderRenderEngine
-from app.services.render_engines.cinema4d import Cinema4DRenderEngine
+from app.services.render_engines.cinema import Cinema4DRenderEngine
 from app.services.render_engines.maya import MayaRenderEngine
 from app.services.render_engines.after_effects import AfterEffectsRenderEngine
 
@@ -35,7 +35,8 @@ def render_project(
     project_path: Path,
     output_path: Path,
     log_path: Path,
-    timeout: int
+    timeout: int,
+    render_type: str = "2d"
 ) -> Path:
     """Delegación transparente al motor especializado."""
     engine = get_engine_for_file(project_path)
@@ -43,5 +44,6 @@ def render_project(
         project_path=project_path,
         output_path=output_path,
         log_path=log_path,
-        timeout=timeout
+        timeout=timeout,
+        render_type=render_type
     )

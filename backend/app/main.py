@@ -9,7 +9,10 @@ from app.api.routes import router
 from app.api.admin_routes import router as admin_router
 from app.services.job_manager import initialize_database
 
+import logging
 
+# Silencia las líneas HTTP repetitivas de Uvicorn (INFO 200 OK)
+logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +36,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"]
 )
 
 app.include_router(router)
